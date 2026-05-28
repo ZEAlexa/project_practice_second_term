@@ -33,6 +33,14 @@ class StringAnomalyCleaner(BaseEstimator, TransformerMixin):
         return X_out
     
 class ScreenResolutionTransformer(BaseEstimator, TransformerMixin):
+    """
+        Класс для кодирования категорий разрешения экрана в числовые признаки. 
+        Добавляет новые числовые признаки:
+            screen_width (ширина)
+            screen_width (высота)
+        Исходный device_screen_resolution удаляется
+        Пропуски заменяются на медианные значения.
+    """
     def __init__(self):
         self.median_width = None
         self.median_height = None
@@ -87,6 +95,10 @@ class ScreenResolutionTransformer(BaseEstimator, TransformerMixin):
         return X_out.drop(columns=['device_screen_resolution'])
     
 class CityAgreggatorTransformer(BaseEstimator, TransformerMixin):
+    """
+        Класс для предобработки категориального признака geo_city 
+        Оставляет топ 30 самых частых городов, остальные меняет на other
+    """
     def __init__(self, top_n=30):
         self.top_n = top_n
         self.top_cities = None
@@ -106,6 +118,17 @@ class CityAgreggatorTransformer(BaseEstimator, TransformerMixin):
         return X_out
     
 class WebTimeFeatureExtractor(BaseEstimator, TransformerMixin):
+    """
+        Класс, для feature engineering временных меток. 
+        Добавляет:
+            visit_hour - час начала сессии
+            is_night - признак ночного времени
+            day_of_week - день недели
+            is_weekend - признак выходных
+            day_of_month - день месяца
+            days_from_start - день с начала запуска исследования
+        Исходные visit_date, visit_time удаляются
+    """
     def __init__(self):
         self.min_date = None
         
@@ -131,6 +154,9 @@ class WebTimeFeatureExtractor(BaseEstimator, TransformerMixin):
         return X_out.drop(columns=['visit_date', 'visit_time'])
     
 class BrandBasedOSImputer(BaseEstimator, TransformerMixin):
+    """
+        Класс, заполняющий пропуски в поле device_os, опираясь на данные из device_brand
+    """
     def __init__(self):
         self.brand_to_os_map = {}
         self.default_os = 'Android'
@@ -163,6 +189,13 @@ class BrandBasedOSImputer(BaseEstimator, TransformerMixin):
         return X_out
     
 class FillerScalerDropper(BaseEstimator, TransformerMixin):
+    """
+        Класс 
+            заполняет оставшиеся пропуски в данных, 
+            кодирует категориальные признаки, 
+            стандартизирует данные.
+        Удаляет из возвращаемых данных session_id и client_id
+    """
     def __init__(self):
 
         # Инструменты для стандартизации и кодирования
